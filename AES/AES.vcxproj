@@ -130,6 +130,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AES.cpp" />
+    <ClCompile Include="AESCore.cpp" />
+    <ClCompile Include="FileEncryption.cpp" />
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AES.h" />
+    <ClInclude Include="AESCore.h" />
+    <ClInclude Include="FileEncryption.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
