@@ -492,7 +492,6 @@ void AES_InvMain(unsigned char* state, unsigned char* expandedKey, int nbrRounds
     AddRoundKey(state, roundKey);
 }
 
-
 char AES_Decrypt(unsigned char* input, unsigned char* output, unsigned char* key,enum keySize size)
 {
     /* the expanded keySize */
