@@ -10,7 +10,7 @@ void DisplayAESExplanationkey(unsigned char* key, enum keySize size)
     unsigned char expandedKeyDisplay[expandedKeySizeDisplay];
 
 
-    expandKey(expandedKeyDisplay, key, size, expandedKeySizeDisplay);
+    CreateExpandKey(expandedKeyDisplay, key, size, expandedKeySizeDisplay);
 
     std::cout << "Expanded Key:\n";
     for (int i = 0; i < expandedKeySizeDisplay; i++) {
@@ -45,12 +45,13 @@ void FileAES()
     
     DisplayAESExplanationkey(key,size);
  
-    std::string inFile = "10mb.txt";
-    std::string outFile = "encrypted_input.bin";
+    std::string inFile = "FileToEncrypt/ChessMove2.jpg";
+    std::string outFile = "EncryptFile/ImageFile2Encrypted_input.bin";
+    
 
 
-    std::ifstream input(inFile, std::ios::binary);
-    if (!input.is_open()) {
+    std::ifstream encryptInput(inFile, std::ios::binary);
+    if (!encryptInput.is_open()) {
         std::cerr << "Failed to open input file: " << inFile << std::endl;
         return;
     }
@@ -59,8 +60,8 @@ void FileAES()
     }
 
 
-    std::ofstream output(outFile, std::ios::binary);
-    if (!output.is_open()) {
+    std::ofstream encrypOutput(outFile, std::ios::binary);
+    if (!encrypOutput.is_open()) {
         std::cerr << "Failed to open output file: " << outFile << std::endl;
         return;
     }
@@ -69,13 +70,13 @@ void FileAES()
     }
 
 
-    input.close();
-    output.close();
+    encryptInput.close();
+    encrypOutput.close();
 
     auto start = std::chrono::high_resolution_clock::now();
 
     // Encrypt the file
-    if (encryptFile(inFile, outFile, key, size)) {
+    if (EncryptFile(inFile, outFile, key, size)) {
         std::cout << "File encryption completed successfully!" << std::endl;
     }
     else {
@@ -89,6 +90,51 @@ void FileAES()
 
     // Output the duration
     std::cout << "Time taken for encryption: " << duration.count() << " seconds" << std::endl;
+
+
+    std::string DecryptOutputFile = "DecryptFile/ImageFile2_unencrypted_text.jpg";
+
+    std::ifstream DecryptInput(outFile, std::ios::binary);
+    if (!DecryptInput.is_open()) {
+        std::cerr << "Failed to open input file: " << outFile << std::endl;
+        return;
+    }
+    else {
+        std::cout << "Input file opened successfully: " << outFile << std::endl;
+    }
+
+
+    std::ofstream DecryptOutput(DecryptOutputFile, std::ios::binary);
+    if (!DecryptOutput.is_open()) {
+        std::cerr << "Failed to open output file: " << DecryptOutputFile << std::endl;
+        return;
+    }
+    else {
+        std::cout << "Output file created/opened successfully: " << DecryptOutputFile << std::endl;
+    }
+
+
+    DecryptInput.close();
+    DecryptOutput.close();
+
+
+    auto DecryptStart = std::chrono::high_resolution_clock::now();
+
+    // Encrypt the file
+    if (DecryptFile(outFile, DecryptOutputFile, key, size)) {
+        std::cout << "File encryption completed successfully!" << std::endl;
+    }
+    else {
+        std::cerr << "File encryption failed!" << std::endl;
+    }
+
+    auto DecryptEnd = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration
+    std::chrono::duration<double> decryptDuration = DecryptEnd - DecryptStart;
+
+    // Output the duration
+    std::cout << "Time taken for Decryption: " << decryptDuration.count() << " seconds" << std::endl;
 
 
 }

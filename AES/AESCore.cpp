@@ -61,7 +61,7 @@ unsigned char Rcon[255] = {
 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33,
 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb };
 
-void rotate(unsigned char* word)
+void Rotate(unsigned char* word)
 {
     unsigned char c;
     int i;
@@ -72,39 +72,39 @@ void rotate(unsigned char* word)
     word[3] = c;
 }
 
-unsigned char getSBoxValue(unsigned char num)
+unsigned char GetSBoxValue(unsigned char num)
 {
     return sbox[num];
 }
 
-unsigned char getSBoxInvert(unsigned char num)
+unsigned char GetSBoxInvert(unsigned char num)
 {
     return rsbox[num];
 }
 
-unsigned char getRconValue(unsigned char num)
+unsigned char GetRconValue(unsigned char num)
 {
     return Rcon[num];
 }
 
-void core(unsigned char* word, int iteration)
+void Core(unsigned char* word, int iteration)
 {
     int i;
 
     /* rotate the 32-bit word 8 bits to the left */
-    rotate(word);
+    Rotate(word);
 
     /* apply S-Box substitution on all 4 parts of the 32-bit word */
     for (i = 0; i < 4; ++i)
     {
-        word[i] = getSBoxValue(word[i]);
+        word[i] = GetSBoxValue(word[i]);
     }
 
     /* XOR the output of the rcon operation with i to the first part (leftmost) only */
-    word[0] = word[0] ^ getRconValue(iteration);
+    word[0] = word[0] ^ GetRconValue(iteration);
 }
 
-void expandKey(unsigned char* expandedKey, unsigned char* key, enum keySize size, size_t expandedKeySize)
+void CreateExpandKey(unsigned char* expandedKey, unsigned char* key, enum keySize size, size_t expandedKeySize)
 {
     /* current expanded keySize, in bytes */
     int currentSize = 0;
@@ -130,13 +130,13 @@ void expandKey(unsigned char* expandedKey, unsigned char* key, enum keySize size
          */
         if (currentSize % size == 0)
         {
-            core(t, rconIteration++);
+            Core(t, rconIteration++);
         }
 
         /* For 256-bit keys, we add an extra sbox to the calculation */
         if (size == SIZE_32 && ((currentSize % size) == 16)) {
             for (i = 0; i < 4; i++)
-                t[i] = getSBoxValue(t[i]);
+                t[i] = GetSBoxValue(t[i]);
         }
 
         /* We XOR t with the four-byte block 16,24,32 bytes before the new expanded key.
@@ -149,25 +149,25 @@ void expandKey(unsigned char* expandedKey, unsigned char* key, enum keySize size
     }
 }
 
-void subBytes(unsigned char* state)
+void SubBytes(unsigned char* state)
 {
     int i;
     /* substitute all the values from the state with the value in the SBox
      * using the state value as index for the SBox
      */
     for (i = 0; i < 16; i++)
-        state[i] = getSBoxValue(state[i]);
+        state[i] = GetSBoxValue(state[i]);
 }
 
-void shiftRows(unsigned char* state)
+void ShiftRows(unsigned char* state)
 {
     int i;
     /* iterate over the 4 rows and call shiftRow() with that row */
     for (i = 0; i < 4; i++)
-        shiftRow(state + i * 4, i);
+        ShiftRow(state + i * 4, i);
 }
 
-void shiftRow(unsigned char* state, unsigned char nbr)
+void ShiftRow(unsigned char* state, unsigned char nbr)
 {
     int i, j;
     unsigned char tmp;
@@ -181,14 +181,14 @@ void shiftRow(unsigned char* state, unsigned char nbr)
     }
 }
 
-void addRoundKey(unsigned char* state, unsigned char* roundKey)
+void AddRoundKey(unsigned char* state, unsigned char* roundKey)
 {
     int i;
     for (i = 0; i < 16; i++)
         state[i] = state[i] ^ roundKey[i];
 }
 
-unsigned char galois_multiplication(unsigned char a, unsigned char b)
+unsigned char Galois_Multiplication(unsigned char a, unsigned char b)
 {
     unsigned char p = 0;
     unsigned char counter;
@@ -205,7 +205,7 @@ unsigned char galois_multiplication(unsigned char a, unsigned char b)
     return p;
 }
 
-void mixColumns(unsigned char* state)
+void MixColumns(unsigned char* state)
 {
     int i, j;
     unsigned char column[4];
@@ -220,7 +220,7 @@ void mixColumns(unsigned char* state)
         }
 
         /* apply the mixColumn on one column */
-        mixColumn(column);
+        MixColumn(column);
 
         /* put the values back into the state */
         for (j = 0; j < 4; j++)
@@ -230,7 +230,7 @@ void mixColumns(unsigned char* state)
     }
 }
 
-void mixColumn(unsigned char* column)
+void MixColumn(unsigned char* column)
 {
     unsigned char cpy[4];
     int i;
@@ -238,36 +238,36 @@ void mixColumn(unsigned char* column)
     {
         cpy[i] = column[i];
     }
-    column[0] = galois_multiplication(cpy[0], 2) ^
-        galois_multiplication(cpy[3], 1) ^
-        galois_multiplication(cpy[2], 1) ^
-        galois_multiplication(cpy[1], 3);
+    column[0] = Galois_Multiplication(cpy[0], 2) ^
+        Galois_Multiplication(cpy[3], 1) ^
+        Galois_Multiplication(cpy[2], 1) ^
+        Galois_Multiplication(cpy[1], 3);
 
-    column[1] = galois_multiplication(cpy[1], 2) ^
-        galois_multiplication(cpy[0], 1) ^
-        galois_multiplication(cpy[3], 1) ^
-        galois_multiplication(cpy[2], 3);
+    column[1] = Galois_Multiplication(cpy[1], 2) ^
+        Galois_Multiplication(cpy[0], 1) ^
+        Galois_Multiplication(cpy[3], 1) ^
+        Galois_Multiplication(cpy[2], 3);
 
-    column[2] = galois_multiplication(cpy[2], 2) ^
-        galois_multiplication(cpy[1], 1) ^
-        galois_multiplication(cpy[0], 1) ^
-        galois_multiplication(cpy[3], 3);
+    column[2] = Galois_Multiplication(cpy[2], 2) ^
+        Galois_Multiplication(cpy[1], 1) ^
+        Galois_Multiplication(cpy[0], 1) ^
+        Galois_Multiplication(cpy[3], 3);
 
-    column[3] = galois_multiplication(cpy[3], 2) ^
-        galois_multiplication(cpy[2], 1) ^
-        galois_multiplication(cpy[1], 1) ^
-        galois_multiplication(cpy[0], 3);
+    column[3] = Galois_Multiplication(cpy[3], 2) ^
+        Galois_Multiplication(cpy[2], 1) ^
+        Galois_Multiplication(cpy[1], 1) ^
+        Galois_Multiplication(cpy[0], 3);
 }
 
-void aes_round(unsigned char* state, unsigned char* roundKey)
+void AES_Round(unsigned char* state, unsigned char* roundKey)
 {
-    subBytes(state);
-    shiftRows(state);
-    mixColumns(state);
-    addRoundKey(state, roundKey);
+    SubBytes(state);
+    ShiftRows(state);
+    MixColumns(state);
+    AddRoundKey(state, roundKey);
 }
 
-void createRoundKey(unsigned char* expandedKey, unsigned char* roundKey)
+void CreateRoundKey(unsigned char* expandedKey, unsigned char* roundKey)
 {
     int i, j;
     /* iterate over the columns */
@@ -279,27 +279,27 @@ void createRoundKey(unsigned char* expandedKey, unsigned char* roundKey)
     }
 }
 
-void aes_main(unsigned char* state, unsigned char* expandedKey, int nbrRounds)
+void AES_Main(unsigned char* state, unsigned char* expandedKey, int nbrRounds)
 {
     int i = 0;
 
     unsigned char roundKey[16];
 
-    createRoundKey(expandedKey, roundKey);
-    addRoundKey(state, roundKey);
+    CreateRoundKey(expandedKey, roundKey);
+    AddRoundKey(state, roundKey);
 
     for (i = 1; i < nbrRounds; i++) {
-        createRoundKey(expandedKey + 16 * i, roundKey);
-        aes_round(state, roundKey);
+        CreateRoundKey(expandedKey + 16 * i, roundKey);
+        AES_Round(state, roundKey);
     }
 
-    createRoundKey(expandedKey + 16 * nbrRounds, roundKey);
-    subBytes(state);
-    shiftRows(state);
-    addRoundKey(state, roundKey);
+    CreateRoundKey(expandedKey + 16 * nbrRounds, roundKey);
+    SubBytes(state);
+    ShiftRows(state);
+    AddRoundKey(state, roundKey);
 }
 
-char aes_encrypt(unsigned char* input, unsigned char* output, unsigned char* key, enum keySize size)
+char AES_Encrypt(unsigned char* input, unsigned char* output, unsigned char* key, enum keySize size)
 {
     // the expanded keySize
     int expandedKeySize;
@@ -359,10 +359,10 @@ char aes_encrypt(unsigned char* input, unsigned char* output, unsigned char* key
         }
 
         // expand the key into an 176, 208, 240 bytes key
-        expandKey(expandedKey, key, size, expandedKeySize);
+        CreateExpandKey(expandedKey, key, size, expandedKeySize);
 
         // encrypt the block using the expandedKey
-        aes_main(block, expandedKey, nbrRounds);
+        AES_Main(block, expandedKey, nbrRounds);
 
         // unmap the block again into the output
         for (i = 0; i < 4; i++)
@@ -380,25 +380,25 @@ char aes_encrypt(unsigned char* input, unsigned char* output, unsigned char* key
     return SUCCESS;
 }
 
-void invSubBytes(unsigned char* state)
+void InvSubBytes(unsigned char* state)
 {
     int i;
     /* substitute all the values from the state with the value in the SBox
      * using the state value as index for the SBox
      */
     for (i = 0; i < 16; i++)
-        state[i] = getSBoxInvert(state[i]);
+        state[i] = GetSBoxInvert(state[i]);
 }
 
-void invShiftRows(unsigned char* state)
+void InvShiftRows(unsigned char* state)
 {
     int i;
     /* iterate over the 4 rows and call invShiftRow() with that row */
     for (i = 0; i < 4; i++)
-        invShiftRow(state + i * 4, i);
+        InvShiftRow(state + i * 4, i);
 }
 
-void invShiftRow(unsigned char* state, unsigned char nbr)
+void InvShiftRow(unsigned char* state, unsigned char nbr)
 {
     int i, j;
     unsigned char tmp;
@@ -412,7 +412,7 @@ void invShiftRow(unsigned char* state, unsigned char nbr)
     }
 }
 
-void invMixColumns(unsigned char* state)
+void InvMixColumns(unsigned char* state)
 {
     int i, j;
     unsigned char column[4];
@@ -427,7 +427,7 @@ void invMixColumns(unsigned char* state)
         }
 
         /* apply the invMixColumn on one column */
-        invMixColumn(column);
+        InvMixColumn(column);
 
         /* put the values back into the state */
         for (j = 0; j < 4; j++)
@@ -437,7 +437,7 @@ void invMixColumns(unsigned char* state)
     }
 }
 
-void invMixColumn(unsigned char* column)
+void InvMixColumn(unsigned char* column)
 {
     unsigned char cpy[4];
     int i;
@@ -445,29 +445,122 @@ void invMixColumn(unsigned char* column)
     {
         cpy[i] = column[i];
     }
-    column[0] = galois_multiplication(cpy[0], 14) ^
-        galois_multiplication(cpy[3], 9) ^
-        galois_multiplication(cpy[2], 13) ^
-        galois_multiplication(cpy[1], 11);
-    column[1] = galois_multiplication(cpy[1], 14) ^
-        galois_multiplication(cpy[0], 9) ^
-        galois_multiplication(cpy[3], 13) ^
-        galois_multiplication(cpy[2], 11);
-    column[2] = galois_multiplication(cpy[2], 14) ^
-        galois_multiplication(cpy[1], 9) ^
-        galois_multiplication(cpy[0], 13) ^
-        galois_multiplication(cpy[3], 11);
-    column[3] = galois_multiplication(cpy[3], 14) ^
-        galois_multiplication(cpy[2], 9) ^
-        galois_multiplication(cpy[1], 13) ^
-        galois_multiplication(cpy[0], 11);
+    column[0] = Galois_Multiplication(cpy[0], 14) ^
+        Galois_Multiplication(cpy[3], 9) ^
+        Galois_Multiplication(cpy[2], 13) ^
+        Galois_Multiplication(cpy[1], 11);
+    column[1] = Galois_Multiplication(cpy[1], 14) ^
+        Galois_Multiplication(cpy[0], 9) ^
+        Galois_Multiplication(cpy[3], 13) ^
+        Galois_Multiplication(cpy[2], 11);
+    column[2] = Galois_Multiplication(cpy[2], 14) ^
+        Galois_Multiplication(cpy[1], 9) ^
+        Galois_Multiplication(cpy[0], 13) ^
+        Galois_Multiplication(cpy[3], 11);
+    column[3] = Galois_Multiplication(cpy[3], 14) ^
+        Galois_Multiplication(cpy[2], 9) ^
+        Galois_Multiplication(cpy[1], 13) ^
+        Galois_Multiplication(cpy[0], 11);
 }
 
-void aes_invRound(unsigned char* state, unsigned char* roundKey)
+void AES_InvRound(unsigned char* state, unsigned char* roundKey)
 {
 
-    invShiftRows(state);
-    invSubBytes(state);
-    addRoundKey(state, roundKey);
-    invMixColumns(state);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, roundKey);
+    InvMixColumns(state);
+}
+
+void AES_InvMain(unsigned char* state, unsigned char* expandedKey, int nbrRounds)
+{
+    int i = 0;
+
+    unsigned char roundKey[16];
+
+    CreateRoundKey(expandedKey + 16 * nbrRounds, roundKey);
+    AddRoundKey(state, roundKey);
+
+    for (i = nbrRounds - 1; i > 0; i--) {
+        CreateRoundKey(expandedKey + 16 * i, roundKey);
+        AES_InvRound(state, roundKey);
+    }
+
+    CreateRoundKey(expandedKey, roundKey);
+    InvShiftRows(state);
+    InvSubBytes(state);
+    AddRoundKey(state, roundKey);
+}
+
+
+char AES_Decrypt(unsigned char* input, unsigned char* output, unsigned char* key,enum keySize size)
+{
+    /* the expanded keySize */
+    int expandedKeySize;
+
+    /* the number of rounds */
+    int nbrRounds;
+
+    /* the expanded key */
+    unsigned char* expandedKey;
+
+    /* the 128 bit block to decode */
+    unsigned char block[16];
+
+    int i, j;
+
+    /* set the number of rounds */
+    switch (size)
+    {
+    case SIZE_16:
+        nbrRounds = 10;
+        break;
+    case SIZE_24:
+        nbrRounds = 12;
+        break;
+    case SIZE_32:
+        nbrRounds = 14;
+        break;
+    default:
+        return UNKNOWN_KEYSIZE;
+        break;
+    }
+
+    expandedKeySize = (16 * (nbrRounds + 1));
+    expandedKey = (unsigned char*)malloc(expandedKeySize * sizeof(unsigned char));
+
+    if (expandedKey == NULL)
+    {
+        return MEMORY_ALLOCATION_PROBLEM;
+    }
+
+    /* Set the block values, for the block:
+     * a0,0 a0,1 a0,2 a0,3
+     * a1,0 a1,1 a1,2 a1,3
+     * a2,0 a2,1 a2,2 a2,3
+     * a3,0 a3,1 a3,2 a3,3
+     * the mapping order is a0,0 a1,0 a2,0 a3,0 a0,1 a1,1 ... a2,3 a3,3
+     */
+
+     /* iterate over the columns */
+    for (i = 0; i < 4; i++)
+    {
+        /* iterate over the rows */
+        for (j = 0; j < 4; j++)
+            block[(i + (j * 4))] = input[(i * 4) + j];
+    }
+
+    /* expand the key into an 176, 208, 240 bytes key */
+    CreateExpandKey(expandedKey, key, size, expandedKeySize);
+
+    /* decrypt the block using the expandedKey */
+    AES_InvMain(block, expandedKey, nbrRounds);
+
+    /* unmap the block again into the output */
+    for (i = 0; i < 4; i++)
+    {
+        /* iterate over the rows */
+        for (j = 0; j < 4; j++)
+            output[(i * 4) + j] = block[(i + (j * 4))];
+    }
 }
