@@ -1,7 +1,7 @@
 // main.cpp
 #include "AES.h"
 #include <chrono>
-
+#include <cstdlib>
 void DisplayAESExplanationkey(unsigned char* key, enum keySize size)
 {
     const int expandedKeySizeDisplay = 240;
@@ -32,6 +32,14 @@ void DisplayAESExplanationkey(unsigned char* key, enum keySize size)
     }
 
 
+    printf("\nExpanded Key (HEX format):\n");
+
+    for (int i = 0; i < expandedKeySizeDisplay; i++)
+    {
+        printf("%2.2x%c", expandedKeyDisplay[i], ((i + 1) % 16) ? ' ' : '\n');
+    }
+
+
 
 }
 
@@ -39,14 +47,14 @@ void FileAES()
 {
 
 
-    unsigned char key[32] = { 0 };
+    unsigned char key[32] = { "Hallo World" };
     enum keySize size = SIZE_32;
 
     
     DisplayAESExplanationkey(key,size);
  
-    std::string inFile = "FileToEncrypt/ChessMove2.jpg";
-    std::string outFile = "EncryptFile/ImageFile2Encrypted_input.bin";
+    std::string inFile = "FileToEncrypt/TestFile.txt";
+    std::string outFile = "EncryptFile/TestFileEncrypted_input.bin";
     
 
 
@@ -92,7 +100,7 @@ void FileAES()
     std::cout << "Time taken for encryption: " << duration.count() << " seconds" << std::endl;
 
 
-    std::string DecryptOutputFile = "DecryptFile/ImageFile2_unencrypted_text.jpg";
+    std::string DecryptOutputFile = "DecryptFile/10mbText_unencrypted.txt";
 
     std::ifstream DecryptInput(outFile, std::ios::binary);
     if (!DecryptInput.is_open()) {
@@ -136,6 +144,11 @@ void FileAES()
     // Output the duration
     std::cout << "Time taken for Decryption: " << decryptDuration.count() << " seconds" << std::endl;
 
+    std::string openOriginalFileCommand = "start " + inFile;
+    system(openOriginalFileCommand.c_str());
+
+    std::string openDecryptedFileCommand = "start " + DecryptOutputFile;
+    system(openDecryptedFileCommand.c_str());
 
 }
 int main(int argc, char* argv[])

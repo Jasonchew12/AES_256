@@ -50,7 +50,7 @@ void AES_Round(unsigned char* state, unsigned char* roundKey);
 void AES_InvRound(unsigned char* state, unsigned char* roundKey);
 void CreateRoundKey(unsigned char* expandedKey, unsigned char* roundKey);
 void AES_Main(unsigned char* state, unsigned char* expandedKey, int nbrRounds);
-
+void AES_InvMain(unsigned char* state, unsigned char* expandedKey, int nbrRounds);
 
 char AES_Encrypt(unsigned char* input, unsigned char* output, unsigned char* key, enum keySize size);
 char AES_Decrypt(unsigned char* input, unsigned char* output, unsigned char* key,enum keySize size);
