@@ -53,7 +53,7 @@ void FileAES()
     
     DisplayAESExplanationkey(key,size);
  
-    std::string inFile = "FileToEncrypt/TestFile.txt";
+    std::string inFile = "FileToEncrypt/10mb-examplefile-com.txt";
     std::string outFile = "EncryptFile/TestFileEncrypted_input.bin";
     
 

@@ -5,6 +5,7 @@
 
 #include "AESCore.h"
 #include "FileEncryption.h"
+#include "omp.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
