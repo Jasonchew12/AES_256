@@ -47,14 +47,14 @@ void FileAES()
 {
 
 
-    unsigned char key[32] = { "Hallo World" };
+    unsigned char key[32] = { "HalloWorldThisIsAStringOfLetter" };
     enum keySize size = SIZE_32;
 
     
     DisplayAESExplanationkey(key,size);
  
-    std::string inFile = "FileToEncrypt/TestFile.txt";
-    std::string outFile = "EncryptFile/TestFileEncrypted_input.bin";
+    std::string inFile = "FileToEncrypt/10mb-examplefile-com.txt";
+    std::string outFile = "EncryptFile/10mbEncryptedCUDA.bin";
     
 
 
