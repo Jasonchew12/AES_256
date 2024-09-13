@@ -12,7 +12,7 @@ bool EncryptFile(const std::string& inFile, const std::string& outFile, unsigned
         return false;
     }
 
-    const int bufferBlocks = 1024;  // Number of blocks to read into memory at once
+    const int bufferBlocks = 8192;  // Number of blocks to read into memory at once
     unsigned char buffer[bufferBlocks * blockSize];
     unsigned char encrypted[bufferBlocks * blockSize];
 
@@ -51,7 +51,7 @@ bool DecryptFile(const std::string& inFile, const std::string& outFile, unsigned
         return false;
     }
 
-    const int bufferBlocks = 1024;  // Number of blocks to read into memory at once
+    const int bufferBlocks = 8192;  // Number of blocks to read into memory at once
     unsigned char buffer[bufferBlocks * blockSize];
     unsigned char decrypted[bufferBlocks * blockSize];
 

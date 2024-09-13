@@ -47,14 +47,15 @@ void FileAES()
 {
 
 
-    unsigned char key[32] = { "Hallo World" };
+    unsigned char key[32] = { "HalloWorldThisIsAStringOfLetter" };
+   
     enum keySize size = SIZE_32;
 
     
     DisplayAESExplanationkey(key,size);
  
-    std::string inFile = "FileToEncrypt/10mb-examplefile-com.txt";
-    std::string outFile = "EncryptFile/TestFileEncrypted_input.bin";
+    std::string inFile = "FileToEncrypt/500mb.txt";
+    std::string outFile = "EncryptFile/10mbEncryptedCan.bin";
     
 
 
@@ -100,7 +101,7 @@ void FileAES()
     std::cout << "Time taken for encryption: " << duration.count() << " seconds" << std::endl;
 
 
-    std::string DecryptOutputFile = "DecryptFile/10mbText_unencrypted.txt";
+    std::string DecryptOutputFile = "DecryptFile/lesson4.pdf";
 
     std::ifstream DecryptInput(outFile, std::ios::binary);
     if (!DecryptInput.is_open()) {
@@ -144,8 +145,8 @@ void FileAES()
     // Output the duration
     std::cout << "Time taken for Decryption: " << decryptDuration.count() << " seconds" << std::endl;
 
-    std::string openOriginalFileCommand = "start " + inFile;
-    system(openOriginalFileCommand.c_str());
+    //std::string openOriginalFileCommand = "start " + inFile;
+    //system(openOriginalFileCommand.c_str());
 
     std::string openDecryptedFileCommand = "start " + DecryptOutputFile;
     system(openDecryptedFileCommand.c_str());
